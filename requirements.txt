@@ -1,0 +1,8 @@
+langchain
+openai
+chromadb
+streamlit
+googletrans==4.0.0-rc1
+PyPDF2
+tiktoken
+python-dotenv
