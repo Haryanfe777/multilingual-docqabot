@@ -1,0 +1,80 @@
+Key Upgrades & Their Impact
+Temporal Dynamics Features (Per Literature):
+
+Flow Vectors: (dx, dy, dz) per joint between frames
+
+Velocity: Speed/direction of joint movement (units/sec)
+
+Acceleration: Rate of velocity change (units/sec²)
+
+Kinetic Energy: Whole-body movement intensity
+
+Advanced Spatial Features:
+
+Torso Orientation: Body rotation angle (critical for dance moves)
+
+3D Joint Angles: More accurate than 2D projections. 2D angles fail to capture complex 3D dance movements. True 3D angle calculation using vector math.
+
+Physics-Based Features:
+
+Momentum and energy calculations.
+
+2. Motion Vectors and Angular Velocities
+   - **Problem**: Static features ignore movement dynamics.
+   - **Solution**: Compute per-joint velocity and angular speed.
+
+
+ **Implementation**: created a comprehensive function `enrich_features` that returns a dictionary of feature categories for better organization.
+
+
+
+1. Flow Vectors (dx, dy, dz per joint between frames)
+Current:
+calculate_flow_vectors computes (dx, dy, dz) for each joint in KEY_FLOW_LANDMARKS between frames, normalized for pose size.
+These are included in the LSTM feature vector if previous_landmarks is provided.
+Status:
+Implemented.
+Note: Only for KEY_FLOW_LANDMARKS (not all 33 joints). If we want all joints, we expand.
+
+
+Velocity (Speed/direction of joint movement, units/sec)
+Current:
+Velocity is calculated as the norm of the flow vector (per joint) in calculate_flow_vectors, and min/max/mean/median are included as features. we scale by time (units/sec), instead of assuming frame-to-frame difference is 1 unit of time.
+
+ Acceleration (Rate of velocity change, units/sec²):  compute acceleration as the difference in velocity between frames, divided by time delta.
+
+ Kinetic Energy (Whole-body movement intensity): get_biomechanical_energy computes a weighted sum of 0.5 * m * v^2 for each joint, using arbitrary weights.
+
+. Torso Orientation (Body rotation angle): get_torso_orientation computes rotation (XY plane) and tilt (XZ plane) of the torso.
+
+ 3D Joint Angles (True 3D, not just 2D projections): get_pose_angles_embedding computes angles in XY, XOZ, and YOZ planes for selected triplets.
+
+Physics-Based Features (Momentum, energy): 
+
+
+Velocity and Acceleration:
+Compute velocity as (current - previous) * fps for each key joint.
+Compute acceleration as (current_velocity - previous_velocity) * fps for each key joint (requires two previous frames; if not available, pad with zeros).
+Add summary statistics (min, max, mean, median) for both velocity and acceleration.
+Momentum (Optional):
+Compute as mass * velocity for each key joint (assume unit mass for simplicity).
+Add summary statistics.
+
+**`inference.py` Modifications**:
+   - **Why?**: To support temporal features, we need to track previous frames' landmarks and features.
+   - **Changes**:
+     - Added state tracking (prev_landmarks, prev_features)
+     - Integrated new feature extraction call
+     - Updated the feature vector construction
+
+
+`dataset.py` Configuration Update**:
+   - **Why?**: The feature dimension has changed from 228 to 147.
+   - **Change**: Update `NB_FEATURE = 147`
+
+
+ **Data Generation Scripts (generate_data.py)**:
+   - **Why?**: The data processing pipeline must use the new feature engineering.
+   - **Changes**:
+     - Modify to handle sequential processing (for temporal features)
+     - Update to call `enrich_features` with history
