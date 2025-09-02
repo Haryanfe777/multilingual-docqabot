@@ -1,1 +1,0 @@
-The text provides a classification of non-metastatic colon cancer based on the TNM staging system, including details on tumor invasion, lymph node involvement, and distant metastases.
