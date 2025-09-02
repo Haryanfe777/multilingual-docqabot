@@ -1,12 +1,24 @@
+# DocQA Multilingual Question-Answering Bot
 
-A robust, production-ready, multilingual Document Question Answering (DocQA) bot. Upload documents (PDF, DOCX, TXT), ask questions in multiple languages, and get accurate, context-aware answers—powered by advanced retrieval, LLMs, and translation.
+DocQA is an advanced multilingual document question-answering system. It allows users to upload documents in various formats, ask natural language questions in their preferred language, and receive accurate, translated answers in real-time.
 
+## Features 🚀
 
-🚀 Features
-Document Ingestion:
-Supports PDF, DOCX, and TXT files.
-Extracts text, images (for OCR), and rich metadata (filename, size, last modified, language).
-Automatic language detection and OCR for scanned documents.
+-- **Multilingual Support**: Ask questions in multiple languages and receive translated responses.
+
+-- **Chat Interface**: Interactive, chat-style UI with dark mode, timestamps, and bubble design.
+
+-- **Language Detection & Translation**: Automatic detection of document language and user language preferences.
+
+-- **Live Language Selector**: Choose UI and answer language anytime.
+
+-- **Backend Intelligence**: Integrated RAG pipeline with translation, summarization, and hybrid chunking.
+
+ ## How it Works 
+-- **Document Ingestion:**
+    -- Supports PDF, DOCX, and TXT files.
+    -- Extracts text, images (for OCR), and rich metadata (filename, size, last modified, language).
+    -- Automatic language detection and OCR for scanned documents.
 
 Chunking & Embeddings:
 Hybrid chunking (semantic, token-aware, overlap) for optimal context.
