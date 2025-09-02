@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 A robust, production-ready, multilingual Document Question Answering (DocQA) bot. Upload documents (PDF, DOCX, TXT), ask questions in multiple languages, and get accurate, context-aware answers—powered by advanced retrieval, LLMs, and translation.
 
 
