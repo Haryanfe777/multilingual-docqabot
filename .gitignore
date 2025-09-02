@@ -215,3 +215,6 @@ api_usage_log.csv
 # Frontend build/cache (if not already ignored)
 frontend/node_modules/
 frontend/dist/
+
+# Local test scripts (kept locally, not in repo)
+test_*.py
