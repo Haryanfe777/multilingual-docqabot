@@ -18,8 +18,7 @@ body, #root {
 }
 
 .web-header {
-  width: 100%;
-  max-width: 600px;
+  width: min(96vw, 1400px);
   margin: 48px auto 0 auto;
   text-align: center;
 }
@@ -38,8 +37,7 @@ body, #root {
 }
 
 .web-main {
-  width: 100%;
-  max-width: 600px;
+  width: min(96vw, 1400px);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -106,7 +104,7 @@ body, #root {
   padding: 18px 22px 16px 22px;
   border-radius: 18px;
   margin-bottom: 18px;
-  max-width: 90%;
+  max-width: 100%;
   word-break: break-word;
   font-size: 1.08rem;
   position: relative;
@@ -126,6 +124,7 @@ body, #root {
   align-self: flex-start;
   margin-right: auto;
   border: 1px solid #35395a;
+  display: block; /* override flex to prevent column splitting */
 }
 .bubble-avatar {
   width: 32px;
@@ -144,6 +143,10 @@ body, #root {
 .bubble-avatar.bot {
   background: #35395a;
 }
+
+/* Keep long labels inline and align language info to the right */
+.answer-bubble strong { white-space: nowrap; }
+.answer-bubble .lang-info { text-align: right; }
 
 .input-area {
   display: flex;

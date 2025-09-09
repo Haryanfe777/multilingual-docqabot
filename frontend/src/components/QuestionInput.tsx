@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export default function QuestionInput({ onAsk, disabled }: { onAsk: (question: string, lang: string) => void, disabled?: boolean }) {
-  const { t, i18n } = useTranslation();
+export default function QuestionInput({ onAsk, disabled, answerLang }: { onAsk: (question: string, lang: string) => void, disabled?: boolean, answerLang: string }) {
+  const { t } = useTranslation();
   const [question, setQuestion] = useState('');
-  const answerLang = i18n.language;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,4 +28,4 @@ export default function QuestionInput({ onAsk, disabled }: { onAsk: (question: s
       </button>
     </form>
   );
-} 
+}

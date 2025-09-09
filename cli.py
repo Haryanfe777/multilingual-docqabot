@@ -1,3 +1,60 @@
+import typer
+from typing import Optional
+from app.ingestion import ingest_document
+from app.embeddings import summarize_text
+from app.rag import EmbeddingModel, embed_chunks, get_chroma_client, get_or_create_collection
+from app.eval import load_jsonl
+import os
+
+app = typer.Typer(help="CLI for ingesting, indexing, and evaluating docs")
+
+
+@app.command()
+def ingest(file: str):
+    """Ingest a local file and print brief metadata."""
+    doc = ingest_document(file)
+    typer.echo(doc)
+
+
+@app.command()
+def index(file: str, collection: str = "doc_chunks"):
+    """Ingest, summarize, and index a file into ChromaDB."""
+    doc = ingest_document(file)
+    text = doc.get("text") or "\n".join(doc.get("text_by_page", []))
+    chunks = summarize_text(text)
+    # Add minimal metadata
+    for c in chunks:
+        c["doc_name"] = doc.get("file_name", os.path.basename(file))
+        c.setdefault("page", c.get("page", 0))
+    embedder = EmbeddingModel(model_name='openai')
+    client = get_chroma_client()
+    _ = get_or_create_collection(client, collection)
+    embed_chunks(chunks, embedder, client=client, collection_name=collection)
+    typer.echo(f"Indexed {len(chunks)} chunks into collection {collection}")
+
+
+@app.command()
+def drop(collection: str = "doc_chunks"):
+    """Drop a ChromaDB collection."""
+    client = get_chroma_client()
+    try:
+        client.delete_collection(collection)
+        typer.echo(f"Dropped collection {collection}")
+    except Exception as e:
+        typer.echo(f"Error: {e}")
+
+
+@app.command()
+def eval(eval_file: str, top_k: int = 5, collection: str = "doc_chunks", out: str = "eval_results.jsonl"):
+    """Run retrieval evaluation over JSONL file."""
+    from scripts.run_eval import main as run
+    # Delegate to the script for now
+    os.system(f"python scripts/run_eval.py {eval_file} --top_k {top_k} --collection {collection} --out {out}")
+
+
+if __name__ == "__main__":
+    app()
+
 import argparse
 import os
 from dotenv import load_dotenv

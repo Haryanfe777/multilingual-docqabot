@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 interface Chunk {
   text: string;
-  metadata?: { source?: string };
+  metadata?: { source?: string; doc_name?: string; page?: number };
 }
 
 interface AnswerDisplayProps {
@@ -24,10 +24,32 @@ export default function AnswerDisplay({ answer, original_answer, loading, error,
   if (loading) return <div>{t('answer')}: ...</div>;
   if (error) return <div style={{ color: 'red' }}>{error}</div>;
   if (!answer) return null;
+
+  const renderFormatted = (text: string) => {
+    // Normalize common bullet/number patterns into "- " prefixed lines
+    const normalized = text
+      .replace(/(?:^|\n|\s)(\d+)[\.\)]\s+/g, () => `\n- `)
+      .replace(/\n?\s*[•\-]\s+/g, () => `\n- `);
+
+    const lines = normalized.split('\n').map((l) => l.trim()).filter(Boolean);
+    const bullets = lines.filter((l) => l.startsWith('- ')).map((l) => l.replace(/^-\s*/, ''));
+
+    if (bullets.length >= 2) {
+      return (
+        <ul style={{ margin: '8px 0 0 18px' }}>
+          {bullets.map((item, idx) => (
+            <li key={idx} style={{ marginBottom: 6 }}>{item}</li>
+          ))}
+        </ul>
+      );
+    }
+    // Fallback: render as paragraph
+    return <div style={{ whiteSpace: 'pre-wrap' }}>{text}</div>;
+  };
   return (
     <div style={{ marginTop: 16 }}>
       <div className={`chat-bubble answer-bubble`}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      image.png        <div style={{ display: 'flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap' }}>
           <strong>{t('answer')}:</strong>
           {translated && (
             <span className="translation-badge">{t('Translated from X', { lang: doc_language })} {translation_engine && `(${translation_engine})`}</span>
@@ -39,20 +61,27 @@ export default function AnswerDisplay({ answer, original_answer, loading, error,
           )}
         </div>
         <div style={{ marginTop: 8 }}>
-          {translated && showOriginal ? original_answer : answer}
+          {renderFormatted(translated && showOriginal ? (original_answer || '') : answer)}
         </div>
-        <div className="lang-info" style={{ fontSize: 12, color: '#888', marginTop: 8 }}>
+        <div className="lang-info" style={{ fontSize: 12, color: '#888', marginTop: 8, textAlign: 'right', whiteSpace: 'nowrap' }}>
           {t('Document Language')}: {doc_language || '-'} | {t('Your Language')}: {user_language || '-'}
         </div>
       </div>
       {chunks && chunks.length > 0 && (
         <div style={{ marginTop: 16 }}>
-          <strong>Supporting Chunks:</strong>
+          <strong>References:</strong>
           <ul>
             {chunks.map((chunk, i) => (
               <li key={i} style={{ marginBottom: 8 }}>
                 <div style={{ fontStyle: 'italic', color: '#444' }}>{chunk.text}</div>
-                {chunk.metadata?.source && <div style={{ fontSize: 12, color: '#888' }}>Source: {chunk.metadata.source}</div>}
+                {chunk.metadata?.source && (
+                  <div style={{ fontSize: 12, color: '#888' }}>
+                    Source: <span className="source-badge">{chunk.metadata.source}</span>
+                    {typeof chunk.metadata.page === 'number' && (
+                      <span> (p. {chunk.metadata.page})</span>
+                    )}
+                  </div>
+                )}
               </li>
             ))}
           </ul>

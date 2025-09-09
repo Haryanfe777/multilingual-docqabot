@@ -112,7 +112,8 @@ def embed_chunks(
     metas = []
     all_ids = []
     for chunk in chunks:
-        chunk_id = chunk.get('chunk_id') or f"{chunk.get('doc_name','doc')}-{chunk.get('page',0)}-{chunk.get('chunk',0)}-{uuid.uuid4()}"
+        # Deterministic chunk id to avoid duplicate re-indexing across runs
+        chunk_id = chunk.get('chunk_id') or f"{chunk.get('doc_name','doc')}-{int(chunk.get('page',0))}-{int(chunk.get('chunk',0))}"
         all_ids.append(chunk_id)
         ids.append(chunk_id)
         docs.append(chunk['text'])
